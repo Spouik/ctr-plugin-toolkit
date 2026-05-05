@@ -30,8 +30,11 @@
 using namespace CTRPluginFramework;
 
 void Pane::Update(Renderer& renderer) {
+  UpdateInternalState();
   renderer.DrawRect(x_, y_, width_, height_, color_);
+}
 
+void Pane::UpdateInternalState() {
   const bool is_down = Touch::IsDown();
   switch (state_) {
     case State::kIdle: {

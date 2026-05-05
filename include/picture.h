@@ -22,23 +22,23 @@
  * SOFTWARE.
  */
 
-#include "test_application.h"
+#ifndef CTR_PLUGIN_TOOLKIT_PICTURE_H
+#define CTR_PLUGIN_TOOLKIT_PICTURE_H
+#include <memory>
 
-#include "renderer.h"
+#include "pane.h"
 
-TestApplication::TestApplication() : btn_switch_theme_(10, 10, 50, 50, 0x001f) {
-  btn_switch_theme_.SetOnRelease([this]() {
-    is_dark_theme_ ^= true;
-  });
-}
+class Picture : public Pane {
+public:
+  Picture() = default;
+  ~Picture() override = default;
+  Picture(u32 offset);
 
-void TestApplication::Update(Renderer& renderer) {
-  const u16 kColor = is_dark_theme_ ? 0x0000 : 0xffff;
+  void Update(Renderer& renderer) override;
 
-  renderer.SetTargetScreen(kTopScreen);
-  renderer.DrawRect(0, 0, 400, 240, kColor);
+private:
+  std::unique_ptr<u16[]> color_buffer_;
+  std::unique_ptr<u8[]> alpha_buffer_;
+};
 
-  renderer.SetTargetScreen(kBottomScreen);
-  renderer.DrawRect(0, 0, 320, 240, kColor);
-  btn_switch_theme_.Update(renderer);
-}
+#endif //CTR_PLUGIN_TOOLKIT_PICTURE_H

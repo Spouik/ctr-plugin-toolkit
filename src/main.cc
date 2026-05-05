@@ -23,13 +23,13 @@
  */
 
 #include "application_manager.h"
-#include "test_application.h"
+#include "home_application.h"
 
 namespace CTRPluginFramework {
 int main() {
   ApplicationManager& application_manager = ApplicationManager::GetInstance();
-  TestApplication test_application;
-  application_manager.SetApplication(&test_application);
+  HomeApplication home_application;
+  application_manager.SetApplication(&home_application);
   application_manager.Run();
   return 0;
 }

@@ -62,12 +62,14 @@ public:
   u16 GetColor() const { return color_; }
   bool IsVisible() const { return is_visible_; }
 
-private:
+protected:
   enum class State : u8 {
     kIdle,
     kHeld,
     kReleased
   };
+
+  void UpdateInternalState();
 
   s16 x_ = 0;
   s16 y_ = 0;

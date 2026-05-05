@@ -22,20 +22,48 @@
  * SOFTWARE.
  */
 
-#ifndef CTR_PLUGIN_TOOLKIT_TEST_APPLICATION_H
-#define CTR_PLUGIN_TOOLKIT_TEST_APPLICATION_H
-#include "entity.h"
-#include "pane.h"
+#include "picture.h"
 
-class TestApplication : public Application {
-public:
-  TestApplication();
-  ~TestApplication() override = default;
-  void Update(Renderer& renderer) override;
+#include "renderer.h"
 
-private:
-  Pane btn_switch_theme_;
-  bool is_dark_theme_ = false;
+#include <CTRPluginFramework/System/File.hpp>
+
+#include "romfs.h"
+
+using namespace CTRPluginFramework;
+
+struct Header {
+  s16 x;
+  s16 y;
+  u16 width;
+  u16 height;
 };
 
-#endif // CTR_PLUGIN_TOOLKIT_TEST_APPLICATION_H
+Picture::Picture(u32 offset) : Pane() {
+  Header header;
+  File file;
+
+  File::Open(file, ROMFS_FILENAME, File::READ);
+
+  file.Seek(offset, File::SET);
+  file.Read(&header, sizeof(header));
+  x_ = header.x;
+  y_ = header.y;
+  width_ = header.width;
+  height_ = header.height;
+
+  color_buffer_ = std::unique_ptr<u16[]>(new u16[width_ * height_]);
+  file.Read(color_buffer_.get(), width_ * height_ * sizeof(u16));
+
+  alpha_buffer_ = std::unique_ptr<u8[]>(new u8[width_ * height_]);
+  file.Read(alpha_buffer_.get(), width_ * height_ * sizeof(u8));
+
+  file.Flush();
+  file.Close();
+}
+
+void Picture::Update(Renderer& renderer) {
+  UpdateInternalState();
+  renderer.DrawPicture(x_, y_, width_, height_, color_buffer_.get(),
+                       alpha_buffer_.get());
+}

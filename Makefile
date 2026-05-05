@@ -100,6 +100,7 @@ relink:
 	@rm -f *.elf *.3gx
 	@$(MAKE)
 	@cp $(TARGET)-release.3gx "$(DEST)/$(TARGET).3gx"
+	@cp assets/romfs.bin $(DEST)/romfs.bin
 	@$(EMULATOR) $(GAME_PATH)
 
 #---------------------------------------------------------------------------------
