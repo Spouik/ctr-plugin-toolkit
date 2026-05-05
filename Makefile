@@ -100,7 +100,7 @@ relink:
 	@rm -f *.elf *.3gx
 	@$(MAKE)
 	@cp $(TARGET)-release.3gx "$(DEST)/$(TARGET).3gx"
-	@$(EMULATOR) $(GAME_PATH) &
+	@$(EMULATOR) $(GAME_PATH)
 
 #---------------------------------------------------------------------------------
 

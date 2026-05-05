@@ -22,16 +22,15 @@
  * SOFTWARE.
  */
 
-#include <CTRPluginFramework.hpp>
+#include "application_manager.h"
+#include "test_application.h"
 
 namespace CTRPluginFramework {
-int main(void) {
-  PluginMenu* menu =
-      new PluginMenu("ctr-plugin-toolkit", 1, 0, 0,
-                     "Created By ZettaD");
-  menu->SynchronizeWithFrame(true);
-  menu->Run();
-  delete menu;
-  return (0);
+int main() {
+  ApplicationManager& application_manager = ApplicationManager::GetInstance();
+  TestApplication test_application;
+  application_manager.SetApplication(&test_application);
+  application_manager.Run();
+  return 0;
 }
 } // namespace CTRPluginFramework
