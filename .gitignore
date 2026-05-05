@@ -1,0 +1,6 @@
+/release
+/debug
+*.3gx
+*.elf
+/.idea
+CMakeLists.txt
