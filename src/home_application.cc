@@ -70,7 +70,7 @@ void HomeApplication::Update(Renderer& renderer) {
   button_settings_.Update(renderer);
 }
 
-void HomeApplication::LoadTheme() {
+void HomeApplication::LoadTheme() const {
   if (is_dark_theme_) {
     top_background_.SetTexture(ROMFS_BACKGROUND_TOP_DARK);
     bottom_background_.SetTexture(ROMFS_BACKGROUND_BOTTOM_DARK);

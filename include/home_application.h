@@ -35,7 +35,7 @@ public:
   void Update(Renderer& renderer) override;
 
 private:
-  void LoadTheme();
+  void LoadTheme() const;
 
   bool is_dark_theme_ = false;
 

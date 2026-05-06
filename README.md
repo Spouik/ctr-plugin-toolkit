@@ -9,7 +9,7 @@
 
 **A powerful base for building highly customized 3DS plugins with full UI control.**
 
-<img src="assets/preview.png" alt="Plugin Preview" width="400px"/>
+<img src="assets/preview.gif" alt="Plugin Preview" width="400px"/>
 
 </div>
 
