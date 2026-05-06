@@ -24,17 +24,34 @@
 
 #include "home_application.h"
 
+#include "background.h"
 #include "renderer.h"
 #include "romfs.h"
 
 HomeApplication::HomeApplication()
-  : button_notebook_(ROMFS_LAYOUT_HOME_NOTEBOOK),
+  : top_background_(Background::GetTop()),
+    bottom_background_(Background::GetBottom()),
+    button_notebook_(ROMFS_LAYOUT_HOME_NOTEBOOK),
     button_medallium_(ROMFS_LAYOUT_HOME_MEDALLIUM),
     button_settings_(ROMFS_LAYOUT_HOME_SETTINGS),
     icon_coin_(ROMFS_LAYOUT_STATUS_COIN),
     icon_soul_(ROMFS_LAYOUT_STATUS_SOUL) {
+  LoadTheme();
+
+  top_background_.SetIsAnimated(true);
+  bottom_background_.SetIsAnimated(true);
+
   button_settings_.SetOnRelease([this]() {
     is_dark_theme_ = !is_dark_theme_;
+    LoadTheme();
+  });
+  button_notebook_.SetOnRelease([this]() {
+    top_background_.ToggleIsHorizontal();
+    bottom_background_.ToggleIsHorizontal();
+  });
+  button_medallium_.SetOnRelease([this]() {
+    top_background_.ToggleDelta();
+    bottom_background_.ToggleDelta();
   });
 }
 
@@ -42,13 +59,23 @@ void HomeApplication::Update(Renderer& renderer) {
   const u16 kBackgroundColor = is_dark_theme_ ? 0x0000 : 0xffff;
 
   renderer.SetTargetScreen(kTopScreen);
-  renderer.DrawRect(0, 0, 400, 240, kBackgroundColor);
+  Background::GetTop().Update(renderer);
   icon_coin_.Update(renderer);
   icon_soul_.Update(renderer);
 
   renderer.SetTargetScreen(kBottomScreen);
-  renderer.DrawRect(0, 0, 320, 240, kBackgroundColor);
+  Background::GetBottom().Update(renderer);
   button_notebook_.Update(renderer);
   button_medallium_.Update(renderer);
   button_settings_.Update(renderer);
+}
+
+void HomeApplication::LoadTheme() {
+  if (is_dark_theme_) {
+    top_background_.SetTexture(ROMFS_BACKGROUND_TOP_DARK);
+    bottom_background_.SetTexture(ROMFS_BACKGROUND_BOTTOM_DARK);
+  } else {
+    top_background_.SetTexture(ROMFS_BACKGROUND_TOP_LIGHT);
+    bottom_background_.SetTexture(ROMFS_BACKGROUND_BOTTOM_LIGHT);
+  }
 }

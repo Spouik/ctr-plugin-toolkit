@@ -60,6 +60,13 @@ public:
   void DrawPicture(s16 x, s16 y, u16 width, u16 height,
                    const u16* color,
                    const u8* alpha) const;
+  void DrawBackground(u16 width, u16 height,
+                      const u16* color) const;
+
+  void DrawAnimatedBackground(u16 width, u16 height,
+                              const u16* color,
+                              bool is_horizontal,
+                              s32 offset) const;
 
 private:
   Renderer() = default;

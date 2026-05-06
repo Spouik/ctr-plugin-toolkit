@@ -6,3 +6,4 @@
 CMakeLists.txt
 assets/romfs.bin
 assets/layout/preview-*
+*.bin

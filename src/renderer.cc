@@ -77,3 +77,70 @@ void Renderer::DrawPicture(s16 x, s16 y, u16 width, u16 height,
     fb += kScreenHeight - height;
   }
 }
+
+void Renderer::DrawBackground(u16 width, u16 height,
+                              const u16* color) const {
+  u16* fb = GetFrameBuffer(0, height - 1);
+  const u16* max = GetFrameBuffer(width, 0);
+  while (fb < max) {
+    *fb++ = *color++;
+  }
+}
+
+void Renderer::DrawAnimatedBackground(u16 width, u16 height,
+                                      const u16* color,
+                                      bool is_horizontal,
+                                      s32 offset) const {
+  if (is_horizontal) {
+    offset %= width;
+    if (offset < 0) offset += width;
+
+    const u16* max = GetFrameBuffer(width, 0);
+
+    u16* fb = GetFrameBuffer(offset, height - 1);
+    const u16* src = color;
+
+    int w = width - offset;
+    while (w--) {
+      int h = height;
+      while (h--) {
+        if (fb <= max)
+          *fb++ = *src++;
+      }
+      fb += kScreenHeight - height;
+    }
+
+    fb = GetFrameBuffer(0, height - 1);
+
+    w = offset;
+    while (w--) {
+      int h = height;
+      while (h--) {
+        if (fb <= max)
+          *fb++ = *src++;
+      }
+      fb += kScreenHeight - height;
+    }
+  } else {
+    offset %= height;
+    if (offset < 0) offset += height;
+
+    for (int col = 0; col < (int)width; col++) {
+      const u16* src_col = color + col * height;
+
+      u16* fb = GetFrameBuffer(col, height - 1);
+
+      const u16* s = src_col + offset;
+      int h = height - offset;
+      while (h--) {
+        *fb++ = *s++;
+      }
+
+      s = src_col;
+      h = offset;
+      while (h--) {
+        *fb++ = *s++;
+      }
+    }
+  }
+}

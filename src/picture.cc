@@ -22,22 +22,13 @@
  * SOFTWARE.
  */
 
-#include "picture.h"
-
-#include "renderer.h"
-
 #include <CTRPluginFramework/System/File.hpp>
 
+#include "picture.h"
+#include "renderer.h"
 #include "romfs.h"
 
 using namespace CTRPluginFramework;
-
-struct Header {
-  s16 x;
-  s16 y;
-  u16 width;
-  u16 height;
-};
 
 Picture::Picture(u32 offset) : Pane() {
   Header header;

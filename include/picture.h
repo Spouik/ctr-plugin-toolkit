@@ -36,9 +36,16 @@ public:
 
   void Update(Renderer& renderer) override;
 
-private:
-  std::unique_ptr<u16[]> color_buffer_;
-  std::unique_ptr<u8[]> alpha_buffer_;
+protected:
+  struct Header {
+    s16 x;
+    s16 y;
+    u16 width;
+    u16 height;
+  };
+
+  std::unique_ptr<u16[]> color_buffer_ = nullptr;
+  std::unique_ptr<u8[]> alpha_buffer_ = nullptr;
 };
 
 #endif //CTR_PLUGIN_TOOLKIT_PICTURE_H

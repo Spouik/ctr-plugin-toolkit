@@ -24,6 +24,7 @@
 
 #ifndef CTR_PLUGIN_TOOLKIT_TEST_APPLICATION_H
 #define CTR_PLUGIN_TOOLKIT_TEST_APPLICATION_H
+#include "background.h"
 #include "entity.h"
 #include "picture.h"
 
@@ -34,7 +35,12 @@ public:
   void Update(Renderer& renderer) override;
 
 private:
+  void LoadTheme();
+
   bool is_dark_theme_ = false;
+
+  Background& top_background_;
+  Background& bottom_background_;
 
   Picture button_notebook_;
   Picture button_medallium_;

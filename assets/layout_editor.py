@@ -14,17 +14,32 @@ LAYOUTS = {
 }
 
 BASE_DIR = Path.cwd() / "layout"
-BASE_DIR.mkdir(parents=True, exist_ok=True)
-
-OUTPUT_FILENAME = "romfs.bin"
-OUTPUT_BIN = Path.cwd() / OUTPUT_FILENAME
+BACKGROUND_DIR = Path.cwd() / "background"
+OUTPUT_BIN = Path.cwd() / "romfs.bin"
 OUTPUT_HEADER = Path.cwd().parent / "include" / "romfs.h"
-OUTPUT_HEADER.parent.mkdir(parents=True, exist_ok=True)
 
+BASE_DIR.mkdir(parents=True, exist_ok=True)
+BACKGROUND_DIR.mkdir(parents=True, exist_ok=True)
+OUTPUT_HEADER.parent.mkdir(parents=True, exist_ok=True)
 
 def RGB888_TO_RGB565(r, g, b):
     return ((b >> 3) & 0x1F) | (((g >> 2) & 0x3F) << 5) | (((r >> 3) & 0x1F) << 11)
 
+class Background:
+    def __init__(self, filepath):
+        self.name = filepath.stem
+        self.img = Image.open(filepath).convert("RGB")
+        self.w, self.h = self.img.size
+        self.pixels = self.img.load()
+
+    def dump_gfx_bytes(self):
+        buf = bytearray()
+        for x in range(self.w):
+            for y in range(self.h):
+                y_inv = self.h - 1 - y
+                r, g, b = self.pixels[x, y_inv]
+                buf += RGB888_TO_RGB565(r, g, b).to_bytes(2, "little")
+        return bytes(buf)
 
 class Picture:
     def __init__(self, asset_dir, filename, x, y):
@@ -36,7 +51,6 @@ class Picture:
 
     def dump_gfx_bytes(self):
         buf = bytearray()
-
         buf += self.x.to_bytes(2, "little")
         buf += self.y.to_bytes(2, "little")
         buf += self.w.to_bytes(2, "little")
@@ -44,71 +58,73 @@ class Picture:
 
         for x in range(self.w):
             for y in range(self.h):
-                y_inv = self.h - y - 1
+                y_inv = self.h - 1 - y
                 r, g, b, _ = self.pixels[x, y_inv]
                 buf += RGB888_TO_RGB565(r, g, b).to_bytes(2, "little")
 
         for x in range(self.w):
             for y in range(self.h):
-                y_inv = self.h - y - 1
+                y_inv = self.h - 1 - y
                 buf.append(self.pixels[x, y_inv][3])
-
         return bytes(buf)
-
 
 def build_romfs():
     layout_offsets = {}
     layout_assets = {}
+    background_offsets = {}
     current_offset = 0
 
-    romfs = open(OUTPUT_BIN, "wb")
-
-    for layout_name, pictures in LAYOUTS.items():
-        layout_offsets[layout_name] = current_offset
-        layout_assets[layout_name] = {}
-
-        asset_dir = BASE_DIR / layout_name
-        asset_dir.mkdir(parents=True, exist_ok=True)
-
-        preview = Image.new("RGBA", (320, 240), (255, 255, 255, 255))
-
-        for pic_name, x, y in pictures:
-            pic = Picture(asset_dir, pic_name, x, y)
-            data = pic.dump_gfx_bytes()
-
+    with open(OUTPUT_BIN, "wb") as romfs:
+        background_files = sorted(BACKGROUND_DIR.glob("*.png"))
+        for filepath in background_files:
+            bg = Background(filepath)
+            data = bg.dump_gfx_bytes()
+            background_offsets[bg.name] = current_offset
             romfs.write(data)
-            preview.paste(pic.img, (x, y), pic.img)
-
-            layout_assets[layout_name][pic_name] = current_offset - layout_offsets[layout_name]
             current_offset += len(data)
 
-        preview.save(BASE_DIR / f"preview-{layout_name}.png")
+        for layout_name, pictures in LAYOUTS.items():
+            layout_offsets[layout_name] = current_offset
+            layout_assets[layout_name] = {}
+            asset_dir = BASE_DIR / layout_name
+            asset_dir.mkdir(parents=True, exist_ok=True)
+            preview = Image.new("RGBA", (320, 240), (0, 0, 0, 0))
 
-    romfs.close()
+            for pic_name, x, y in pictures:
+                pic = Picture(asset_dir, pic_name, x, y)
+                data = pic.dump_gfx_bytes()
+                romfs.write(data)
+                preview.paste(pic.img, (x, y), pic.img)
+                layout_assets[layout_name][pic_name] = current_offset - layout_offsets[layout_name]
+                current_offset += len(data)
+            preview.save(BASE_DIR / f"preview-{layout_name}.png")
 
-    lines = []
-    lines.append("#ifndef CTR_PLUGIN_TOOLKIT_ROMFS_H")
-    lines.append("#define CTR_PLUGIN_TOOLKIT_ROMFS_H")
-    lines.append("")
+    lines = [
+        "#ifndef CTR_PLUGIN_TOOLKIT_ROMFS_H",
+        "#define CTR_PLUGIN_TOOLKIT_ROMFS_H",
+        "",
+        f'#define ROMFS_FILENAME "{OUTPUT_BIN.name}"',
+        "",
+        "// Backgrounds"
+    ]
 
-    lines.append(f"#define ROMFS_FILENAME \"{OUTPUT_FILENAME}\"")
+    for name, offset in background_offsets.items():
+        lines.append(f"#define ROMFS_BACKGROUND_{name.upper()} 0x{offset:08X}")
 
+    lines.append("\n// Layouts")
     for name, offset in layout_offsets.items():
         lines.append(f"#define ROMFS_LAYOUT_{name.upper()} 0x{offset:08X}")
 
     lines.append("")
-
     for layout_name, assets in layout_assets.items():
-        for pic_name, offset in assets.items():
+        for pic_name, rel_offset in assets.items():
             lines.append(
                 f"#define ROMFS_LAYOUT_{layout_name.upper()}_{pic_name.upper()} "
-                f"(ROMFS_LAYOUT_{layout_name.upper()}+0x{offset:08X})"
+                f"(ROMFS_LAYOUT_{layout_name.upper()}+0x{rel_offset:08X})"
             )
 
-    lines.append("")
-    lines.append("#endif // CTR_PLUGIN_TOOLKIT_ROMFS_H")
-
+    lines.append("\n#endif")
     OUTPUT_HEADER.write_text("\n".join(lines))
 
-
-build_romfs()
+if __name__ == "__main__":
+    build_romfs()
