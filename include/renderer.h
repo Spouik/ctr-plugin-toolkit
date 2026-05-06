@@ -57,9 +57,15 @@ public:
   }
 
   void DrawRect(s16 x, s16 y, u16 width, u16 height, u16 color) const;
+
   void DrawPicture(s16 x, s16 y, u16 width, u16 height,
                    const u16* color,
                    const u8* alpha) const;
+
+  void DrawGlyph(s16 x, s16 y, u16 width, u16 height,
+                 u16 color,
+                 const u8* alpha) const;
+
   void DrawBackground(u16 width, u16 height,
                       const u16* color) const;
 

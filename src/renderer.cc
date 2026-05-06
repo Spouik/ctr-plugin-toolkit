@@ -144,3 +144,34 @@ void Renderer::DrawAnimatedBackground(u16 width, u16 height,
     }
   }
 }
+
+void Renderer::DrawGlyph(s16 x, s16 y, u16 width, u16 height,
+                         u16 color,
+                         const u8* alpha) const {
+  u16* fb = GetFrameBuffer(x, y + height - 1);
+
+  while (width--) {
+    s32 h = height;
+    while (h--) {
+      u8 a = *alpha++;
+
+      if (a == 0) {
+        fb++;
+      } else if (a == 255) {
+        *fb++ = color;
+      } else {
+        u16 oc = *fb;
+        u16 nc = color;
+
+        u32 weight_n = a >> 2; // 0-63
+        u32 weight_o = 64 - weight_n; // 64-1
+
+        u32 rb = ((nc & 0xF81F) * weight_n + (oc & 0xF81F) * weight_o) >> 6;
+        u32 g = ((nc & 0x07E0) * weight_n + (oc & 0x07E0) * weight_o) >> 6;
+
+        *fb++ = (u16)((rb & 0xF81F) | (g & 0x07E0));
+      }
+    }
+    fb += kScreenHeight - height;
+  }
+}

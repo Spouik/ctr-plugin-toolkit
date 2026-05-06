@@ -27,6 +27,7 @@
 #include "background.h"
 #include "entity.h"
 #include "picture.h"
+#include "text_box.h"
 
 class HomeApplication : public Application {
 public:
@@ -38,6 +39,7 @@ private:
   void LoadTheme() const;
 
   bool is_dark_theme_ = false;
+  u16 title_color_ = 0x0000;
 
   Background& top_background_;
   Background& bottom_background_;
@@ -48,6 +50,9 @@ private:
 
   Picture icon_coin_;
   Picture icon_soul_;
+
+  TextBox title_;
+  Font mono_font_;
 };
 
 #endif // CTR_PLUGIN_TOOLKIT_TEST_APPLICATION_H

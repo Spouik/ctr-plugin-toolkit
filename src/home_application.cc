@@ -35,8 +35,14 @@ HomeApplication::HomeApplication()
     button_medallium_(ROMFS_LAYOUT_HOME_MEDALLIUM),
     button_settings_(ROMFS_LAYOUT_HOME_SETTINGS),
     icon_coin_(ROMFS_LAYOUT_STATUS_COIN),
-    icon_soul_(ROMFS_LAYOUT_STATUS_SOUL) {
+    icon_soul_(ROMFS_LAYOUT_STATUS_SOUL),
+    mono_font_(ROMFS_FONT_SOURCE_CODE_PRO) {
   LoadTheme();
+
+  title_.SetFont(&mono_font_);
+  title_.SetText("ctr-plugin-toolkit v%d.%d", 1, 0);
+  title_.SetColor(title_color_);
+  title_.SetXY(10, 200);
 
   top_background_.SetIsAnimated(true);
   bottom_background_.SetIsAnimated(true);
@@ -53,21 +59,27 @@ HomeApplication::HomeApplication()
     top_background_.ToggleDelta();
     bottom_background_.ToggleDelta();
   });
+
+  title_.SetOnRelease([this]() {
+    title_color_ ^= 0xffff;
+    title_.SetColor(title_color_);
+  });
 }
 
 void HomeApplication::Update(Renderer& renderer) {
   const u16 kBackgroundColor = is_dark_theme_ ? 0x0000 : 0xffff;
 
   renderer.SetTargetScreen(kTopScreen);
-  Background::GetTop().Update(renderer);
+  top_background_.Update(renderer);
   icon_coin_.Update(renderer);
   icon_soul_.Update(renderer);
 
   renderer.SetTargetScreen(kBottomScreen);
-  Background::GetBottom().Update(renderer);
+  bottom_background_.Update(renderer);
   button_notebook_.Update(renderer);
   button_medallium_.Update(renderer);
   button_settings_.Update(renderer);
+  title_.Update(renderer);
 }
 
 void HomeApplication::LoadTheme() const {

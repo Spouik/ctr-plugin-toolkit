@@ -45,6 +45,12 @@ public:
   // Setters
   void SetX(const s16 x) { x_ = x; }
   void SetY(const s16 y) { y_ = y; }
+
+  void SetXY(const s16 x, const s16 y) {
+    x_ = x;
+    y_ = y;
+  }
+
   void SetWidth(const u16 width) { width_ = width; }
   void SetHeight(const u16 height) { height_ = height; }
   void SetColor(const u16 color) { color_ = color; }
