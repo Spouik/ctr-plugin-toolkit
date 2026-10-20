@@ -27,10 +27,10 @@
 
 namespace CTRPluginFramework {
 int main() {
-  ApplicationManager& application_manager = ApplicationManager::GetInstance();
+  /*ApplicationManager& application_manager = ApplicationManager::GetInstance();
   HomeApplication home_application;
   application_manager.SetApplication(&home_application);
-  application_manager.Run();
+  application_manager.Run();*/
   return 0;
 }
 } // namespace CTRPluginFramework

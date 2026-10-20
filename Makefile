@@ -9,15 +9,15 @@ endif
 export TOPDIR ?= $(CURDIR)
 include $(DEVKITARM)/3ds_rules
 
-DEST      := C:/Users/David/AppData/Roaming/Azahar/sdmc/luma/plugins/000400000011C500
-EMULATOR  := "C:/Program Files/Azahar/azahar.exe"
-GAME_PATH := "C:/Users/David/Desktop/ctr/cia/sango.3ds"
+DEST      := C:/Users/Kylian/AppData/Roaming/Azahar/sdmc/luma/plugins/0004000000055E00
+EMULATOR  := "D:/Émulateurs/Azahar/azahar.exe"
+GAME_PATH := "D:/Émulateurs/Roms 3DS/Pokémon_Y.cci"
 
 CTRPFLIB	?=	$(DEVKITPRO)/libctrpf
 
 TARGET		:= 	$(notdir $(CURDIR))
 INCLUDES	:= 	include \
-				../Library/include
+				Includes
 
 SOURCES 	:= 	src
 
