@@ -29,9 +29,9 @@ class Renderer;
 
 class Entity {
 public:
-  virtual ~Entity() = default;
+    virtual ~Entity() = default;
 
-  virtual void Update(Renderer& renderer) = 0;
+    virtual void Update(Renderer& renderer) = 0;
 };
 
 using Application = Entity;

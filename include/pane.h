@@ -31,60 +31,60 @@
 
 class Pane : public Entity {
 public:
-  Pane() = default;
+    Pane() = default;
 
-  Pane(const s16 x, const s16 y, const u16 width, const u16 height,
-       const u16 color) :
-    x_(x), y_(y), width_(width), height_(height), color_(color) {
-  }
+    Pane(const s16 x, const s16 y, const u16 width, const u16 height,
+        const u16 color) :
+        x_(x), y_(y), width_(width), height_(height), color_(color) {
+    }
 
-  ~Pane() override = default;
+    ~Pane() override = default;
 
-  void Update(Renderer& renderer) override;
+    void Update(Renderer& renderer) override;
 
-  // Setters
-  void SetX(const s16 x) { x_ = x; }
-  void SetY(const s16 y) { y_ = y; }
+    // Setters
+    void SetX(const s16 x) { x_ = x; }
+    void SetY(const s16 y) { y_ = y; }
 
-  void SetXY(const s16 x, const s16 y) {
-    x_ = x;
-    y_ = y;
-  }
+    void SetXY(const s16 x, const s16 y) {
+        x_ = x;
+        y_ = y;
+    }
 
-  void SetWidth(const u16 width) { width_ = width; }
-  void SetHeight(const u16 height) { height_ = height; }
-  void SetColor(const u16 color) { color_ = color; }
-  void SetIsVisible(const bool is_visible) { is_visible_ = is_visible; }
+    void SetWidth(const u16 width) { width_ = width; }
+    void SetHeight(const u16 height) { height_ = height; }
+    void SetColor(const u16 color) { color_ = color; }
+    void SetIsVisible(const bool is_visible) { is_visible_ = is_visible; }
 
-  void SetOnRelease(const std::function<void()>& on_release) {
-    on_release_ = on_release;
-  }
+    void SetOnRelease(const std::function<void()>& on_release) {
+        on_release_ = on_release;
+    }
 
-  // Getters
-  s16 GetX() const { return x_; }
-  s16 GetY() const { return y_; }
-  u16 GetWidth() const { return width_; }
-  u16 GetHeight() const { return height_; }
-  u16 GetColor() const { return color_; }
-  bool IsVisible() const { return is_visible_; }
+    // Getters
+    s16 GetX() const { return x_; }
+    s16 GetY() const { return y_; }
+    u16 GetWidth() const { return width_; }
+    u16 GetHeight() const { return height_; }
+    u16 GetColor() const { return color_; }
+    bool IsVisible() const { return is_visible_; }
 
 protected:
-  enum class State : u8 {
-    kIdle,
-    kHeld,
-    kReleased
-  };
+    enum class State : u8 {
+        kIdle,
+        kHeld,
+        kReleased
+    };
 
-  void UpdateInternalState();
+    void UpdateInternalState();
 
-  s16 x_ = 0;
-  s16 y_ = 0;
-  u16 width_ = 0;
-  u16 height_ = 0;
-  u16 color_ = 0xffff;
-  bool is_visible_ = true;
-  State state_ = State::kIdle;
-  std::function<void()> on_release_ = nullptr;
+    s16 x_ = 0;
+    s16 y_ = 0;
+    u16 width_ = 0;
+    u16 height_ = 0;
+    u16 color_ = 0xffff;
+    bool is_visible_ = true;
+    State state_ = State::kIdle;
+    std::function<void()> on_release_ = nullptr;
 };
 
 

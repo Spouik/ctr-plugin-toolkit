@@ -10,8 +10,8 @@
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -22,15 +22,29 @@
  * SOFTWARE.
  */
 
+#include <CTRPluginFramework.hpp>
+
 #include "application_manager.h"
 #include "home_application.h"
 
 namespace CTRPluginFramework {
-int main() {
-  /*ApplicationManager& application_manager = ApplicationManager::GetInstance();
-  HomeApplication home_application;
-  application_manager.SetApplication(&home_application);
-  application_manager.Run();*/
-  return 0;
-}
-} // namespace CTRPluginFramework
+
+    bool CustomOSD(const Screen& screen) {
+        screen.DrawSysfont("SSM loaded", 10, 10);
+        return true;
+    }
+
+    bool delock = false;
+    bool old_odds = false;
+
+    int main() {
+        OSD::Run(CustomOSD);
+        File* monFichier = new File();
+        monFichier->Create("./monFichier");
+        ApplicationManager& application_manager = ApplicationManager::GetInstance();
+        HomeApplication home_application;
+        application_manager.SetApplication(&home_application);
+        application_manager.Run();
+        return 0;
+    }
+}  // namespace CTRPluginFramework

@@ -17,7 +17,7 @@ CTRPFLIB	?=	$(DEVKITPRO)/libctrpf
 
 TARGET		:= 	$(notdir $(CURDIR))
 INCLUDES	:= 	include \
-				Includes
+				../Library/include
 
 SOURCES 	:= 	src
 

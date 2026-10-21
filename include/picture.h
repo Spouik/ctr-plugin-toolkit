@@ -30,22 +30,22 @@
 
 class Picture : public Pane {
 public:
-  Picture() = default;
-  ~Picture() override = default;
-  Picture(u32 offset);
+    Picture() = default;
+    ~Picture() override = default;
+    Picture(u32 offset);
 
-  void Update(Renderer& renderer) override;
+    void Update(Renderer& renderer) override;
 
 protected:
-  struct Header {
-    s16 x;
-    s16 y;
-    u16 width;
-    u16 height;
-  };
+    struct Header {
+        s16 x;
+        s16 y;
+        u16 width;
+        u16 height;
+    };
 
-  std::unique_ptr<u16[]> color_buffer_ = nullptr;
-  std::unique_ptr<u8[]> alpha_buffer_ = nullptr;
+    std::unique_ptr<u16[]> color_buffer_ = nullptr;
+    std::unique_ptr<u8[]> alpha_buffer_ = nullptr;
 };
 
 #endif //CTR_PLUGIN_TOOLKIT_PICTURE_H

@@ -25,7 +25,7 @@
 #include "text_box.h"
 
 extern "C" {
-#include <3DS/util/utf.h>
+#include <3ds/util/utf.h>
 }
 
 #include <cstdarg>

@@ -25,153 +25,158 @@
 #include "renderer.h"
 
 void Renderer::DrawRect(s16 x, s16 y, u16 width, u16 height, u16 color) const {
-  u16* fb = GetFrameBuffer(x, y + height - 1);
-  while (width--) {
-    s16 h = height;
-    while (h--) {
-      *fb++ = color;
+    u16* fb = GetFrameBuffer(x, y + height - 1);
+    while (width--) {
+        s16 h = height;
+        while (h--) {
+            *fb++ = color;
+        }
+        fb += kScreenHeight - height;
     }
-    fb += kScreenHeight - height;
-  }
 }
 
 void Renderer::DrawPicture(s16 x, s16 y, u16 width, u16 height,
-                           const u16* color,
-                           const u8* alpha) const {
-  u16* fb = GetFrameBuffer(x, y + height - 1);
+    const u16* color,
+    const u8* alpha) const {
+    u16* fb = GetFrameBuffer(x, y + height - 1);
 
-  if (alpha == nullptr) {
+    if (alpha == nullptr) {
+        while (width--) {
+            s32 h = height;
+            while (h--) {
+                *fb++ = *color++;
+            }
+            fb += kScreenHeight - height;
+        }
+        return;
+    }
+
     while (width--) {
-      s32 h = height;
-      while (h--) {
-        *fb++ = *color++;
-      }
-      fb += kScreenHeight - height;
+        s32 h = height;
+        while (h--) {
+            u8 a = *alpha++;
+
+            if (a == 255) {
+                *fb++ = *color++;
+            }
+            else if (a == 0) {
+                fb++;
+                color++;
+            }
+            else {
+                u16 oc = *fb;
+                u16 nc = *color++;
+
+                u32 weight_n = a >> 2; // 0-63
+                u32 weight_o = 64 - weight_n; // 64-1
+
+                u32 rb = ((nc & 0xF81F) * weight_n + (oc & 0xF81F) * weight_o) >> 6;
+                u32 g = ((nc & 0x07E0) * weight_n + (oc & 0x07E0) * weight_o) >> 6;
+
+                *fb++ = (u16)((rb & 0xF81F) | (g & 0x07E0));
+            }
+        }
+        fb += kScreenHeight - height;
     }
-    return;
-  }
-
-  while (width--) {
-    s32 h = height;
-    while (h--) {
-      u8 a = *alpha++;
-
-      if (a == 255) {
-        *fb++ = *color++;
-      } else if (a == 0) {
-        fb++;
-        color++;
-      } else {
-        u16 oc = *fb;
-        u16 nc = *color++;
-
-        u32 weight_n = a >> 2; // 0-63
-        u32 weight_o = 64 - weight_n; // 64-1
-
-        u32 rb = ((nc & 0xF81F) * weight_n + (oc & 0xF81F) * weight_o) >> 6;
-        u32 g = ((nc & 0x07E0) * weight_n + (oc & 0x07E0) * weight_o) >> 6;
-
-        *fb++ = (u16)((rb & 0xF81F) | (g & 0x07E0));
-      }
-    }
-    fb += kScreenHeight - height;
-  }
 }
 
 void Renderer::DrawBackground(u16 width, u16 height,
-                              const u16* color) const {
-  u16* fb = GetFrameBuffer(0, height - 1);
-  const u16* max = GetFrameBuffer(width, 0);
-  while (fb < max) {
-    *fb++ = *color++;
-  }
+    const u16* color) const {
+    u16* fb = GetFrameBuffer(0, height - 1);
+    const u16* max = GetFrameBuffer(width, 0);
+    while (fb < max) {
+        *fb++ = *color++;
+    }
 }
 
 void Renderer::DrawAnimatedBackground(u16 width, u16 height,
-                                      const u16* color,
-                                      bool is_horizontal,
-                                      s32 offset) const {
-  if (is_horizontal) {
-    offset %= width;
-    if (offset < 0) offset += width;
+    const u16* color,
+    bool is_horizontal,
+    s32 offset) const {
+    if (is_horizontal) {
+        offset %= width;
+        if (offset < 0) offset += width;
 
-    const u16* max = GetFrameBuffer(width, 0);
+        const u16* max = GetFrameBuffer(width, 0);
 
-    u16* fb = GetFrameBuffer(offset, height - 1);
-    const u16* src = color;
+        u16* fb = GetFrameBuffer(offset, height - 1);
+        const u16* src = color;
 
-    int w = width - offset;
-    while (w--) {
-      int h = height;
-      while (h--) {
-        if (fb <= max)
-          *fb++ = *src++;
-      }
-      fb += kScreenHeight - height;
+        int w = width - offset;
+        while (w--) {
+            int h = height;
+            while (h--) {
+                if (fb <= max)
+                    *fb++ = *src++;
+            }
+            fb += kScreenHeight - height;
+        }
+
+        fb = GetFrameBuffer(0, height - 1);
+
+        w = offset;
+        while (w--) {
+            int h = height;
+            while (h--) {
+                if (fb <= max)
+                    *fb++ = *src++;
+            }
+            fb += kScreenHeight - height;
+        }
     }
+    else {
+        offset %= height;
+        if (offset < 0) offset += height;
 
-    fb = GetFrameBuffer(0, height - 1);
+        for (int col = 0; col < (int)width; col++) {
+            const u16* src_col = color + col * height;
 
-    w = offset;
-    while (w--) {
-      int h = height;
-      while (h--) {
-        if (fb <= max)
-          *fb++ = *src++;
-      }
-      fb += kScreenHeight - height;
+            u16* fb = GetFrameBuffer(col, height - 1);
+
+            const u16* s = src_col + offset;
+            int h = height - offset;
+            while (h--) {
+                *fb++ = *s++;
+            }
+
+            s = src_col;
+            h = offset;
+            while (h--) {
+                *fb++ = *s++;
+            }
+        }
     }
-  } else {
-    offset %= height;
-    if (offset < 0) offset += height;
-
-    for (int col = 0; col < (int)width; col++) {
-      const u16* src_col = color + col * height;
-
-      u16* fb = GetFrameBuffer(col, height - 1);
-
-      const u16* s = src_col + offset;
-      int h = height - offset;
-      while (h--) {
-        *fb++ = *s++;
-      }
-
-      s = src_col;
-      h = offset;
-      while (h--) {
-        *fb++ = *s++;
-      }
-    }
-  }
 }
 
 void Renderer::DrawGlyph(s16 x, s16 y, u16 width, u16 height,
-                         u16 color,
-                         const u8* alpha) const {
-  u16* fb = GetFrameBuffer(x, y + height - 1);
+    u16 color,
+    const u8* alpha) const {
+    u16* fb = GetFrameBuffer(x, y + height - 1);
 
-  while (width--) {
-    s32 h = height;
-    while (h--) {
-      u8 a = *alpha++;
+    while (width--) {
+        s32 h = height;
+        while (h--) {
+            u8 a = *alpha++;
 
-      if (a == 0) {
-        fb++;
-      } else if (a == 255) {
-        *fb++ = color;
-      } else {
-        u16 oc = *fb;
-        u16 nc = color;
+            if (a == 0) {
+                fb++;
+            }
+            else if (a == 255) {
+                *fb++ = color;
+            }
+            else {
+                u16 oc = *fb;
+                u16 nc = color;
 
-        u32 weight_n = a >> 2; // 0-63
-        u32 weight_o = 64 - weight_n; // 64-1
+                u32 weight_n = a >> 2; // 0-63
+                u32 weight_o = 64 - weight_n; // 64-1
 
-        u32 rb = ((nc & 0xF81F) * weight_n + (oc & 0xF81F) * weight_o) >> 6;
-        u32 g = ((nc & 0x07E0) * weight_n + (oc & 0x07E0) * weight_o) >> 6;
+                u32 rb = ((nc & 0xF81F) * weight_n + (oc & 0xF81F) * weight_o) >> 6;
+                u32 g = ((nc & 0x07E0) * weight_n + (oc & 0x07E0) * weight_o) >> 6;
 
-        *fb++ = (u16)((rb & 0xF81F) | (g & 0x07E0));
-      }
+                *fb++ = (u16)((rb & 0xF81F) | (g & 0x07E0));
+            }
+        }
+        fb += kScreenHeight - height;
     }
-    fb += kScreenHeight - height;
-  }
 }

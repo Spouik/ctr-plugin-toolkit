@@ -28,65 +28,65 @@
 #include <CTRPluginFramework/Graphics/OSD.hpp>
 
 enum TargetScreen {
-  kTopScreen = 0,
-  kBottomScreen = 1
+    kTopScreen = 0,
+    kBottomScreen = 1
 };
 
 class Renderer {
 public:
-  Renderer(const Renderer&) = delete;
-  Renderer& operator=(const Renderer&) = delete;
-  Renderer(Renderer&&) = delete;
-  Renderer& operator=(Renderer&&) = delete;
+    Renderer(const Renderer&) = delete;
+    Renderer& operator=(const Renderer&) = delete;
+    Renderer(Renderer&&) = delete;
+    Renderer& operator=(Renderer&&) = delete;
 
-  static Renderer& GetInstance() {
-    static Renderer instance;
-    return instance;
-  }
+    static Renderer& GetInstance() {
+        static Renderer instance;
+        return instance;
+    }
 
-  void SetTargetScreen(const TargetScreen target_screen) {
-    target_screen_ = target_screen;
-  }
+    void SetTargetScreen(const TargetScreen target_screen) {
+        target_screen_ = target_screen;
+    }
 
-  u16* GetFrameBuffer(const s32 x, const s32 y) const {
-    u16* base = target_screen_ == kTopScreen
-                  ? (u16*)top_screen_.LeftFramebuffer
-                  : (u16*)bottom_screen_.LeftFramebuffer;
-    const u32 offset = kScreenHeight - 1 - y + x * kScreenHeight;
-    return base + offset;
-  }
+    u16* GetFrameBuffer(const s32 x, const s32 y) const {
+        u16* base = target_screen_ == kTopScreen
+            ? (u16*)top_screen_.LeftFramebuffer
+            : (u16*)bottom_screen_.LeftFramebuffer;
+        const u32 offset = kScreenHeight - 1 - y + x * kScreenHeight;
+        return base + offset;
+    }
 
-  void DrawRect(s16 x, s16 y, u16 width, u16 height, u16 color) const;
+    void DrawRect(s16 x, s16 y, u16 width, u16 height, u16 color) const;
 
-  void DrawPicture(s16 x, s16 y, u16 width, u16 height,
-                   const u16* color,
-                   const u8* alpha) const;
+    void DrawPicture(s16 x, s16 y, u16 width, u16 height,
+        const u16* color,
+        const u8* alpha) const;
 
-  void DrawGlyph(s16 x, s16 y, u16 width, u16 height,
-                 u16 color,
-                 const u8* alpha) const;
+    void DrawGlyph(s16 x, s16 y, u16 width, u16 height,
+        u16 color,
+        const u8* alpha) const;
 
-  void DrawBackground(u16 width, u16 height,
-                      const u16* color) const;
+    void DrawBackground(u16 width, u16 height,
+        const u16* color) const;
 
-  void DrawAnimatedBackground(u16 width, u16 height,
-                              const u16* color,
-                              bool is_horizontal,
-                              s32 offset) const;
+    void DrawAnimatedBackground(u16 width, u16 height,
+        const u16* color,
+        bool is_horizontal,
+        s32 offset) const;
 
 private:
-  Renderer() = default;
+    Renderer() = default;
 
-  static constexpr u32 kTopScreenWidth = 400;
-  static constexpr u32 kBottomScreenWidth = 320;
-  static constexpr u32 kScreenHeight = 240;
+    static constexpr u32 kTopScreenWidth = 400;
+    static constexpr u32 kBottomScreenWidth = 320;
+    static constexpr u32 kScreenHeight = 240;
 
-  const CTRPluginFramework::Screen& top_screen_ =
-      CTRPluginFramework::OSD::GetTopScreen();
-  const CTRPluginFramework::Screen& bottom_screen_ =
-      CTRPluginFramework::OSD::GetBottomScreen();
+    const CTRPluginFramework::Screen& top_screen_ =
+        CTRPluginFramework::OSD::GetTopScreen();
+    const CTRPluginFramework::Screen& bottom_screen_ =
+        CTRPluginFramework::OSD::GetBottomScreen();
 
-  TargetScreen target_screen_ = kTopScreen;
+    TargetScreen target_screen_ = kTopScreen;
 };
 
 #endif // CTR_PLUGIN_TOOLKIT_RENDERER_H

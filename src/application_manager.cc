@@ -34,22 +34,22 @@
 using namespace CTRPluginFramework;
 
 void ApplicationManager::Run() const {
-  if (application_ == nullptr) return;
-  Renderer& renderer = Renderer::GetInstance();
-  while (true) {
-    Controller::Update();
-    if (Controller::IsKeyPressed(kMenuToggleKey)) {
-      Process::Pause();
-      while (true) {
+    if (application_ == nullptr) return;
+    Renderer& renderer = Renderer::GetInstance();
+    while (true) {
         Controller::Update();
         if (Controller::IsKeyPressed(kMenuToggleKey)) {
-          break;
+            Process::Pause();
+            while (true) {
+                Controller::Update();
+                if (Controller::IsKeyPressed(kMenuToggleKey)) {
+                    break;
+                }
+                application_->Update(renderer);
+                OSD::SwapBuffers();
+            }
+            Process::Play();
         }
-        application_->Update(renderer);
-        OSD::SwapBuffers();
-      }
-      Process::Play();
+        Sleep(Milliseconds(kSleepTimeMs));
     }
-    Sleep(Milliseconds(kSleepTimeMs));
-  }
 }
