@@ -22,6 +22,7 @@
  * SOFTWARE.
  */
 
+#include "application_manager.h"
 #include "home_application.h"
 
 #include "background.h"
@@ -31,11 +32,12 @@
 HomeApplication::HomeApplication()
     : top_background_(Background::GetTop()),
     bottom_background_(Background::GetBottom()),
-    button_notebook_(ROMFS_LAYOUT_HOME_NOTEBOOK),
-    button_medallium_(ROMFS_LAYOUT_HOME_MEDALLIUM),
-    button_settings_(ROMFS_LAYOUT_HOME_SETTINGS),
-    icon_coin_(ROMFS_LAYOUT_STATUS_COIN),
-    icon_soul_(ROMFS_LAYOUT_STATUS_SOUL),
+    // button_notebook_(ROMFS_LAYOUT_HOME_NOTEBOOK),
+    // button_medallium_(ROMFS_LAYOUT_HOME_MEDALLIUM),
+    // button_settings_(ROMFS_LAYOUT_HOME_SETTINGS),
+    // icon_coin_(ROMFS_LAYOUT_STATUS_COIN),
+    // icon_soul_(ROMFS_LAYOUT_STATUS_SOUL),
+    plugin_title_(ROMFS_LAYOUT_OTHERS_TITLE),
     mono_font_(ROMFS_FONT_SOURCE_CODE_PRO) {
     LoadTheme();
 
@@ -47,21 +49,23 @@ HomeApplication::HomeApplication()
     top_background_.SetIsAnimated(true);
     bottom_background_.SetIsAnimated(true);
 
-    button_settings_.SetOnRelease([this]() {
-        is_dark_theme_ = !is_dark_theme_;
-        LoadTheme();
-        });
-    button_notebook_.SetOnRelease([this]() {
-        top_background_.ToggleIsHorizontal();
-        bottom_background_.ToggleIsHorizontal();
-        });
-    button_medallium_.SetOnRelease([this]() {
-        top_background_.ToggleDelta();
-        bottom_background_.ToggleDelta();
-        });
+    // button_settings_.SetOnRelease([this]() {
+    //     is_dark_theme_ = !is_dark_theme_;
+    //     LoadTheme();
+    //     });
+    // button_notebook_.SetOnRelease([this]() {
+    //     top_background_.ToggleIsHorizontal();
+    //     bottom_background_.ToggleIsHorizontal();
+    //     });
+    // button_medallium_.SetOnRelease([this]() {
+    //     top_background_.ToggleDelta();
+    //     bottom_background_.ToggleDelta();
+    //     });
 
     title_.SetOnRelease([this]() {
         title_color_ ^= 0xffff;
+        
+         
         title_.SetColor(title_color_);
         });
 }
@@ -71,23 +75,25 @@ void HomeApplication::Update(Renderer& renderer) {
 
     renderer.SetTargetScreen(kTopScreen);
     top_background_.Update(renderer);
-    icon_coin_.Update(renderer);
-    icon_soul_.Update(renderer);
+    plugin_title_.Update(renderer);
+    // icon_coin_.Update(renderer);
+    // icon_soul_.Update(renderer);
 
     renderer.SetTargetScreen(kBottomScreen);
     bottom_background_.Update(renderer);
-    button_notebook_.Update(renderer);
-    button_medallium_.Update(renderer);
-    button_settings_.Update(renderer);
+    // button_notebook_.Update(renderer);
+    // button_medallium_.Update(renderer);
+    // button_settings_.Update(renderer);
     title_.Update(renderer);
 }
 
 void HomeApplication::LoadTheme() const {
     top_background_.SetTexture(ROMFS_BACKGROUND_TOP_SCREEN);
-    if (is_dark_theme_) {
-        bottom_background_.SetTexture(ROMFS_BACKGROUND_BOTTOM_DARK);
-    }
-    else {
-        bottom_background_.SetTexture(ROMFS_BACKGROUND_BOTTOM_LIGHT);
-    }
+    bottom_background_.SetTexture(ROMFS_BACKGROUND_TOP_SCREEN);
+    // if (is_dark_theme_) {
+    //     bottom_background_.SetTexture(ROMFS_BACKGROUND_BOTTOM_DARK);
+    // }
+    // else {
+    //     bottom_background_.SetTexture(ROMFS_BACKGROUND_BOTTOM_LIGHT);
+    // }
 }

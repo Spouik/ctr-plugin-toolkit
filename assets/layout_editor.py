@@ -3,14 +3,11 @@ from PIL import Image
 from pathlib import Path
 
 LAYOUTS = {
-    "home": [
-        ("medallium", 12, 39),
-        ("notebook", 85, 39),
-        ("settings", 158, 39),
+    "text_box": [
+        ("text_box_top", 12, 39)
     ],
-    "status": [
-        ("soul", 10, 10),
-        ("coin", 50, 10),
+    "others": [
+        ("title", 10, 10)
     ]
 }
 

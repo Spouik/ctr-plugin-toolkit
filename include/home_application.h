@@ -44,12 +44,14 @@ private:
   Background& top_background_;
   Background& bottom_background_;
 
-  Picture button_notebook_;
-  Picture button_medallium_;
-  Picture button_settings_;
+//   Picture button_notebook_;
+//   Picture button_medallium_;
+//   Picture button_settings_;
 
-  Picture icon_coin_;
-  Picture icon_soul_;
+//   Picture icon_coin_;
+//   Picture icon_soul_;
+
+  Picture plugin_title_;
 
   TextBox title_;
   Font mono_font_;

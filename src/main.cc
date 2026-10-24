@@ -23,24 +23,63 @@
  */
 
 #include <CTRPluginFramework.hpp>
-
+#include <string>
 #include "application_manager.h"
 #include "home_application.h"
 
 namespace CTRPluginFramework {
 
-    bool CustomOSD(const Screen& screen) {
-        screen.DrawSysfont("SSM loaded", 10, 10);
+    enum Location { NONE, TOP, BOTTOM };
+
+    bool DebugOSD(const Screen& screen) {
+        u32 y = 10;
+        u8 readValue = 0;
+        y = screen.Draw("SSM loaded", 10, y);
+        Process::Read8(0x0014F690, readValue); 
+        char buf[32];
+        snprintf(buf, sizeof(buf), "Lock Address : 0x%02X", readValue);
+        y = screen.Draw(buf, 10, y);
+        if (readValue == 0x09)
+        {
+            y = screen.Draw("UNLOCKED", 10, y, Color::Green);
+        }
+        else
+        {
+            y = screen.Draw("LOCKED", 10, y, Color::Red);
+        }
+        Process::Read8(0x00168adc, readValue); 
+        buf[32];
+        snprintf(buf, sizeof(buf), "Odds Address : 0x%02X", readValue);
+        y = screen.Draw(buf, 10, y);
+        if (readValue == 0x08)
+        {
+            y = screen.Draw("8192 ODDS", 10, y, Color::Green);
+        }
+        else
+        {
+            y = screen.Draw("4096 ODDS", 10, y, Color::Red);
+        }
+        
+        
         return true;
     }
 
     bool delock = false;
-    bool old_odds = false;
+    bool oldOdds = false;
+    bool notifyScreen = TOP;
+    bool debug = true;
 
     int main() {
-        OSD::Run(CustomOSD);
-        File* monFichier = new File();
-        monFichier->Create("./monFichier");
+        Process::Write8(0x0014F690, 0x09);
+        Process::Write8(0x00168adc, 0x08);
+        if (debug)
+        {
+            OSD::Run(DebugOSD);
+        }
+        
+        
+        // File* monFichier = new File();
+        // monFichier->Create("./monFichier");
         ApplicationManager& application_manager = ApplicationManager::GetInstance();
         HomeApplication home_application;
         application_manager.SetApplication(&home_application);
