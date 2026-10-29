@@ -37,14 +37,18 @@ HomeApplication::HomeApplication()
     // button_settings_(ROMFS_LAYOUT_HOME_SETTINGS),
     // icon_coin_(ROMFS_LAYOUT_STATUS_COIN),
     // icon_soul_(ROMFS_LAYOUT_STATUS_SOUL),
-    plugin_title_(ROMFS_LAYOUT_OTHERS_TITLE),
-    mono_font_(ROMFS_FONT_SOURCE_CODE_PRO) {
+    plugin_top_(ROMFS_LAYOUT_OTHERS_TOP_SCREEN),
+    mono_font_(ROMFS_FONT_SOURCE_CODE_PRO),
+    delock_btn_(ROMFS_LAYOUT_OTHERS_TOP_SCREEN, 10, 10) {
     LoadTheme();
 
     title_.SetFont(&mono_font_);
     title_.SetText("ctr-plugin-toolkit v%d.%d", 1, 0);
     title_.SetColor(title_color_);
     title_.SetXY(10, 200);
+
+    delock_btn_.getText().SetFont(&mono_font_);
+    delock_btn_.getText().SetText("Hello World!");
 
     top_background_.SetIsAnimated(true);
     bottom_background_.SetIsAnimated(true);
@@ -75,7 +79,7 @@ void HomeApplication::Update(Renderer& renderer) {
 
     renderer.SetTargetScreen(kTopScreen);
     top_background_.Update(renderer);
-    plugin_title_.Update(renderer);
+    plugin_top_.Update(renderer);
     // icon_coin_.Update(renderer);
     // icon_soul_.Update(renderer);
 

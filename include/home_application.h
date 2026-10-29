@@ -26,35 +26,34 @@
 #define CTR_PLUGIN_TOOLKIT_TEST_APPLICATION_H
 #include "background.h"
 #include "entity.h"
-#include "picture.h"
-#include "text_box.h"
+#include "picture_text.h"
 
 class HomeApplication : public Application {
 public:
-  HomeApplication();
-  ~HomeApplication() override = default;
-  void Update(Renderer& renderer) override;
+    HomeApplication();
+    ~HomeApplication() override = default;
+    void Update(Renderer& renderer) override;
 
 private:
-  void LoadTheme() const;
+    void LoadTheme() const;
 
-  bool is_dark_theme_ = false;
-  u16 title_color_ = 0x0000;
+    bool is_dark_theme_ = false;
+    u16 title_color_ = 0x0000;
 
-  Background& top_background_;
-  Background& bottom_background_;
+    Background& top_background_;
+    Background& bottom_background_;
 
-//   Picture button_notebook_;
-//   Picture button_medallium_;
-//   Picture button_settings_;
+    //   Picture button_notebook_;
+    //   Picture button_medallium_;
+    //   Picture button_settings_;
 
-//   Picture icon_coin_;
-//   Picture icon_soul_;
+    //   Picture icon_coin_;
+    //   Picture icon_soul_;
 
-  Picture plugin_title_;
-
-  TextBox title_;
-  Font mono_font_;
+    Picture plugin_top_;
+    PictureText delock_btn_;
+    TextBox title_;
+    Font mono_font_;
 };
 
 #endif // CTR_PLUGIN_TOOLKIT_TEST_APPLICATION_H

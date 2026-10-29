@@ -3,11 +3,8 @@ from PIL import Image
 from pathlib import Path
 
 LAYOUTS = {
-    "text_box": [
-        ("text_box_top", 12, 39)
-    ],
     "others": [
-        ("title", 10, 10)
+        ("top_screen", 0, 0)
     ]
 }
 
