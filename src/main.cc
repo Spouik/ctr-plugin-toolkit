@@ -31,7 +31,24 @@ namespace CTRPluginFramework {
 
     enum Location { NONE, TOP, BOTTOM };
 
-    bool DebugOSD(const Screen& screen) {
+    struct Config {
+        Location notify = TOP;
+        bool delock = false;
+        std::string test;
+        int result;
+    };
+    static Config g_config;
+
+    void loadConfig(Config &config) {
+        File configFile;
+        config.result = File::Open(configFile, "config.ini");
+        std::string content(configFile.GetSize(), '\0');
+        configFile.Read(&content[0], content.size());
+        config.test = content.data();
+        configFile.Close();
+    }
+
+    bool debugOSD(const Screen& screen) {
         u32 y = 10;
         u8 readValue = 0;
         y = screen.Draw("SSM loaded", 10, y);
@@ -59,6 +76,9 @@ namespace CTRPluginFramework {
         {
             y = screen.Draw("4096 ODDS", 10, y, Color::Red);
         }
+        std::string maChaine = "Read result = " + std::to_string(g_config.result);
+        y = screen.Draw(maChaine, 10, y);
+        y = screen.Draw(g_config.test, 10, y);
         
         
         return true;
@@ -70,11 +90,22 @@ namespace CTRPluginFramework {
     bool debug = true;
 
     int main() {
+        if (!(File::Exists("./config.ini")))
+        {
+            File* configFile = new File();
+            File::Create("./config.ini");
+            File::Open(*configFile, "./config.ini");
+            configFile->WriteLine("Coucou");
+            configFile->Close();
+        }
+        loadConfig(g_config);
+        
+
         Process::Write8(0x0014F690, 0x09);
         Process::Write8(0x00168adc, 0x08);
         if (debug)
         {
-            OSD::Run(DebugOSD);
+            OSD::Run(debugOSD);
         }
         
         

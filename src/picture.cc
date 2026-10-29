@@ -53,6 +53,29 @@ Picture::Picture(u32 offset) : Pane() {
     file.Close();
 }
 
+void Picture::SetTexture(u32 offset) {
+    Header header;
+    File file;
+
+    File::Open(file, ROMFS_FILENAME, File::READ);
+
+    file.Seek(offset, File::SET);
+    file.Read(&header, sizeof(header));
+    x_ = header.x;
+    y_ = header.y;
+    width_ = header.width;
+    height_ = header.height;
+
+    color_buffer_ = std::unique_ptr<u16[]>(new u16[width_ * height_]);
+    file.Read(color_buffer_.get(), width_ * height_ * sizeof(u16));
+
+    alpha_buffer_ = std::unique_ptr<u8[]>(new u8[width_ * height_]);
+    file.Read(alpha_buffer_.get(), width_ * height_ * sizeof(u8));
+
+    file.Flush();
+    file.Close();
+}
+
 void Picture::Update(Renderer& renderer) {
     UpdateInternalState();
     renderer.DrawPicture(x_, y_, width_, height_, color_buffer_.get(),

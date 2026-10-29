@@ -4,7 +4,13 @@ from pathlib import Path
 
 LAYOUTS = {
     "others": [
-        ("top_screen", 0, 0)
+        ("top_screen", 0, 0),
+        ("bottom_screen", 0,0)
+    ],
+    "text_box": [
+        ("text_box_bottom", 0, 0),
+        ("toggle_off_bottom", 244, 15),
+        ("toggle_on_bottom", 244, 15)
     ]
 }
 

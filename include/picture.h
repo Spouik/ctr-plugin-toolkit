@@ -34,6 +34,7 @@ public:
     ~Picture() override = default;
     Picture(u32 offset);
 
+    void SetTexture(u32 offset);
     void Update(Renderer& renderer) override;
 
 protected:

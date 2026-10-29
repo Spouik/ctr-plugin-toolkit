@@ -26,7 +26,8 @@
 #define CTR_PLUGIN_TOOLKIT_TEST_APPLICATION_H
 #include "background.h"
 #include "entity.h"
-#include "picture_text.h"
+#include "picture.h"
+#include "text_box.h"
 
 class HomeApplication : public Application {
 public:
@@ -37,6 +38,7 @@ public:
 private:
     void LoadTheme() const;
 
+    bool delock_ = false;
     bool is_dark_theme_ = false;
     u16 title_color_ = 0x0000;
 
@@ -50,8 +52,12 @@ private:
     //   Picture icon_coin_;
     //   Picture icon_soul_;
 
-    Picture plugin_top_;
-    PictureText delock_btn_;
+    Picture delock_option_;
+    Picture toggle_delock_;
+    TextBox delock_text_;
+
+    Picture back_pattern_top_;
+    Picture back_pattern_bottom_;
     TextBox title_;
     Font mono_font_;
 };

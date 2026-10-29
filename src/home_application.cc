@@ -37,18 +37,19 @@ HomeApplication::HomeApplication()
     // button_settings_(ROMFS_LAYOUT_HOME_SETTINGS),
     // icon_coin_(ROMFS_LAYOUT_STATUS_COIN),
     // icon_soul_(ROMFS_LAYOUT_STATUS_SOUL),
-    plugin_top_(ROMFS_LAYOUT_OTHERS_TOP_SCREEN),
-    mono_font_(ROMFS_FONT_SOURCE_CODE_PRO),
-    delock_btn_(ROMFS_LAYOUT_OTHERS_TOP_SCREEN, 10, 10) {
+    delock_option_(ROMFS_LAYOUT_TEXT_BOX_TEXT_BOX_BOTTOM),
+    toggle_delock_(ROMFS_LAYOUT_TEXT_BOX_TOGGLE_OFF_BOTTOM),
+    back_pattern_top_(ROMFS_LAYOUT_OTHERS_TOP_SCREEN),
+    back_pattern_bottom_(ROMFS_LAYOUT_OTHERS_BOTTOM_SCREEN),
+    mono_font_(ROMFS_FONT_SOURCE_CODE_PRO) {
     LoadTheme();
 
     title_.SetFont(&mono_font_);
     title_.SetText("ctr-plugin-toolkit v%d.%d", 1, 0);
     title_.SetColor(title_color_);
-    title_.SetXY(10, 200);
+    title_.SetXY(25, 200);
 
-    delock_btn_.getText().SetFont(&mono_font_);
-    delock_btn_.getText().SetText("Hello World!");
+
 
     top_background_.SetIsAnimated(true);
     bottom_background_.SetIsAnimated(true);
@@ -65,11 +66,28 @@ HomeApplication::HomeApplication()
     //     top_background_.ToggleDelta();
     //     bottom_background_.ToggleDelta();
     //     });
+    toggle_delock_.SetOnRelease([this]() {
+        if (delock_)
+        {
+            toggle_delock_.SetTexture(ROMFS_LAYOUT_TEXT_BOX_TOGGLE_OFF_BOTTOM);
+        }
+        else
+        {
+            toggle_delock_.SetTexture(ROMFS_LAYOUT_TEXT_BOX_TOGGLE_ON_BOTTOM);
+        }
+
+        delock_ = !delock_;
+        });
+
+    delock_text_.SetFont(&mono_font_);
+    delock_text_.SetText("Enlever le Shiny Lock\n");
+    delock_text_.SetColor(title_color_);
+    delock_text_.SetXY(25, 20);
 
     title_.SetOnRelease([this]() {
         title_color_ ^= 0xffff;
-        
-         
+
+
         title_.SetColor(title_color_);
         });
 }
@@ -78,26 +96,33 @@ void HomeApplication::Update(Renderer& renderer) {
     const u16 kBackgroundColor = is_dark_theme_ ? 0x0000 : 0xffff;
 
     renderer.SetTargetScreen(kTopScreen);
-    top_background_.Update(renderer);
-    plugin_top_.Update(renderer);
+    // top_background_.Update(renderer);
+    // back_pattern_top_.Update(renderer);
+
     // icon_coin_.Update(renderer);
     // icon_soul_.Update(renderer);
 
     renderer.SetTargetScreen(kBottomScreen);
     bottom_background_.Update(renderer);
+    back_pattern_bottom_.Update(renderer);
+    delock_option_.Update(renderer);
+    toggle_delock_.Update(renderer);
     // button_notebook_.Update(renderer);
     // button_medallium_.Update(renderer);
     // button_settings_.Update(renderer);
+    delock_text_.Update(renderer);
     title_.Update(renderer);
 }
 
 void HomeApplication::LoadTheme() const {
     top_background_.SetTexture(ROMFS_BACKGROUND_TOP_SCREEN);
-    bottom_background_.SetTexture(ROMFS_BACKGROUND_TOP_SCREEN);
+    bottom_background_.SetTexture(ROMFS_BACKGROUND_BOTTOM_SCREEN);
     // if (is_dark_theme_) {
     //     bottom_background_.SetTexture(ROMFS_BACKGROUND_BOTTOM_DARK);
     // }
     // else {
     //     bottom_background_.SetTexture(ROMFS_BACKGROUND_BOTTOM_LIGHT);
     // }
+
+
 }
