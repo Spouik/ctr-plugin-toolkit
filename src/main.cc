@@ -82,6 +82,8 @@ namespace CTRPluginFramework {
         }
         ConfigFile::load(gConfig);
         gConfig.test2 = ConfigFile::clean(ConfigFile::readLine("config.ini", 1));
+        gConfig.delock = true;
+        ConfigFile::write(gConfig, "config.ini");
         
 
         Process::Write8(0x0014F690, 0x09);
