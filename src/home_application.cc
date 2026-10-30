@@ -37,17 +37,38 @@ HomeApplication::HomeApplication()
     // button_settings_(ROMFS_LAYOUT_HOME_SETTINGS),
     // icon_coin_(ROMFS_LAYOUT_STATUS_COIN),
     // icon_soul_(ROMFS_LAYOUT_STATUS_SOUL),
+    debug_option_(ROMFS_LAYOUT_TEXT_BOX_TEXT_BOX_BOTTOM),
+    debug_toggle_(ROMFS_LAYOUT_TEXT_BOX_TOGGLE_OFF_BOTTOM),
     delock_option_(ROMFS_LAYOUT_TEXT_BOX_TEXT_BOX_BOTTOM),
-    toggle_delock_(ROMFS_LAYOUT_TEXT_BOX_TOGGLE_OFF_BOTTOM),
+    delock_toggle_(ROMFS_LAYOUT_TEXT_BOX_TOGGLE_OFF_BOTTOM),
+    old_odds_option_(ROMFS_LAYOUT_TEXT_BOX_TEXT_BOX_BOTTOM),
+    old_odds_toggle_(ROMFS_LAYOUT_TEXT_BOX_TOGGLE_OFF_BOTTOM),
     back_pattern_top_(ROMFS_LAYOUT_OTHERS_TOP_SCREEN),
     back_pattern_bottom_(ROMFS_LAYOUT_OTHERS_BOTTOM_SCREEN),
     mono_font_(ROMFS_FONT_SOURCE_CODE_PRO) {
     LoadTheme();
-
-    title_.SetFont(&mono_font_);
-    title_.SetText("ctr-plugin-toolkit v%d.%d", 1, 0);
-    title_.SetColor(title_color_);
-    title_.SetXY(25, 200);
+    std::string content = CTRPluginFramework::ConfigFile::getContentFromPath("config.ini");
+    debug_ = CTRPluginFramework::ConfigFile::readParamBool("debug", content);
+    delock_ = CTRPluginFramework::ConfigFile::readParamBool("delock", content);
+    old_odds_ = CTRPluginFramework::ConfigFile::readParamBool("old_odds", content);
+    // title_.SetFont(&mono_font_);
+    // title_.SetText("ctr-plugin-toolkit v%d.%d", 1, 0);
+    // title_.SetColor(title_color_);
+    // title_.SetXY(25, 200);
+    if (debug_)
+    {
+        debug_toggle_.SetTexture(ROMFS_LAYOUT_TEXT_BOX_TOGGLE_OFF_BOTTOM);
+    }
+    if (delock_)
+    {
+        delock_toggle_.SetTexture(ROMFS_LAYOUT_TEXT_BOX_TOGGLE_OFF_BOTTOM);
+        delock_toggle_.SetXY(debug_toggle_.GetX(), debug_toggle_.GetY() + 50);
+    }
+    if (old_odds_)
+    {
+        old_odds_toggle_.SetTexture(ROMFS_LAYOUT_TEXT_BOX_TOGGLE_OFF_BOTTOM);
+        old_odds_toggle_.SetXY(delock_toggle_.GetX(), delock_toggle_.GetY() + 50);
+    }
 
 
 
@@ -66,30 +87,74 @@ HomeApplication::HomeApplication()
     //     top_background_.ToggleDelta();
     //     bottom_background_.ToggleDelta();
     //     });
-    toggle_delock_.SetOnRelease([this]() {
-        if (delock_)
+
+    // DEBUG
+    debug_toggle_.SetOnRelease([this]() {
+        if (debug_)
         {
-            toggle_delock_.SetTexture(ROMFS_LAYOUT_TEXT_BOX_TOGGLE_OFF_BOTTOM);
+            debug_toggle_.SetTexture(ROMFS_LAYOUT_TEXT_BOX_TOGGLE_OFF_BOTTOM);
         }
         else
         {
-            toggle_delock_.SetTexture(ROMFS_LAYOUT_TEXT_BOX_TOGGLE_ON_BOTTOM);
+            debug_toggle_.SetTexture(ROMFS_LAYOUT_TEXT_BOX_TOGGLE_ON_BOTTOM);
+        }
+
+        debug_ = !debug_;
+        });
+
+    debug_text_.SetFont(&mono_font_);
+    debug_text_.SetText("Mode Debug\n");
+    debug_text_.SetColor(title_color_);
+    debug_text_.SetXY(25, 22);
+
+
+    // DELOCK
+    delock_toggle_.SetOnRelease([this]() {
+        if (delock_)
+        {
+            delock_toggle_.SetTexture(ROMFS_LAYOUT_TEXT_BOX_TOGGLE_OFF_BOTTOM);
+            delock_toggle_.SetXY(debug_toggle_.GetX(), debug_toggle_.GetY() + 50);
+        }
+        else
+        {
+            delock_toggle_.SetTexture(ROMFS_LAYOUT_TEXT_BOX_TOGGLE_ON_BOTTOM);
+            delock_toggle_.SetXY(debug_toggle_.GetX(), debug_toggle_.GetY() + 50);
         }
 
         delock_ = !delock_;
         });
 
+    delock_option_.SetXY(0, debug_option_.GetY() + 50);
+    delock_toggle_.SetXY(debug_toggle_.GetX(), debug_toggle_.GetY() + 50);
     delock_text_.SetFont(&mono_font_);
     delock_text_.SetText("Enlever le Shiny Lock\n");
     delock_text_.SetColor(title_color_);
-    delock_text_.SetXY(25, 20);
+    delock_text_.SetXY(25, debug_text_.GetY() + 50);
 
-    title_.SetOnRelease([this]() {
-        title_color_ ^= 0xffff;
+    // DELOCK
+    old_odds_toggle_.SetOnRelease([this]() {
+        if (old_odds_)
+        {
+            old_odds_toggle_.SetTexture(ROMFS_LAYOUT_TEXT_BOX_TOGGLE_OFF_BOTTOM);
+            old_odds_toggle_.SetXY(delock_toggle_.GetX(), delock_toggle_.GetY() + 50);
+        }
+        else
+        {
+            old_odds_toggle_.SetTexture(ROMFS_LAYOUT_TEXT_BOX_TOGGLE_ON_BOTTOM);
+            old_odds_toggle_.SetXY(delock_toggle_.GetX(), delock_toggle_.GetY() + 50);
+        }
 
-
-        title_.SetColor(title_color_);
+        old_odds_ = !old_odds_;
         });
+
+    old_odds_option_.SetXY(0, delock_option_.GetY() + 50);
+    old_odds_toggle_.SetXY(delock_toggle_.GetX(), delock_toggle_.GetY() + 50);
+    old_odds_text_.SetFont(&mono_font_);
+    old_odds_text_.SetText("Taux 1/8192\n");
+    old_odds_text_.SetColor(title_color_);
+    old_odds_text_.SetXY(25, delock_text_.GetY() + 50);
+
+
 }
 
 void HomeApplication::Update(Renderer& renderer) {
@@ -105,13 +170,19 @@ void HomeApplication::Update(Renderer& renderer) {
     renderer.SetTargetScreen(kBottomScreen);
     bottom_background_.Update(renderer);
     back_pattern_bottom_.Update(renderer);
+    debug_option_.Update(renderer);
+    debug_toggle_.Update(renderer);
+    debug_text_.Update(renderer);
     delock_option_.Update(renderer);
-    toggle_delock_.Update(renderer);
+    delock_toggle_.Update(renderer);
+    delock_text_.Update(renderer);
+    old_odds_option_.Update(renderer);
+    old_odds_toggle_.Update(renderer);
+    old_odds_text_.Update(renderer);
     // button_notebook_.Update(renderer);
     // button_medallium_.Update(renderer);
     // button_settings_.Update(renderer);
-    delock_text_.Update(renderer);
-    title_.Update(renderer);
+    // title_.Update(renderer);
 }
 
 void HomeApplication::LoadTheme() const {
@@ -124,5 +195,30 @@ void HomeApplication::LoadTheme() const {
     //     bottom_background_.SetTexture(ROMFS_BACKGROUND_BOTTOM_LIGHT);
     // }
 
+
+}
+
+void HomeApplication::OnClosing(CTRPluginFramework::Config& config) {
+    config.debug = debug_;
+    config.delock = delock_;
+    config.old_odds = old_odds_;
+    CTRPluginFramework::ConfigFile::write(config, "config.ini");
+    if (config.delock)
+    {
+        CTRPluginFramework::Process::Write8(0x0014F690, 0x09);
+    }
+    else
+    {
+        CTRPluginFramework::Process::Write8(0x0014F690, 0x18);
+    }
+
+    if (config.old_odds)
+    {
+        CTRPluginFramework::Process::Write8(0x00168adc, 0x08);
+    }
+    else
+    {
+        CTRPluginFramework::Process::Write8(0x00168adc, 0x10);
+    }
 
 }

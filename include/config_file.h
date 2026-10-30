@@ -58,17 +58,25 @@ namespace CTRPluginFramework {
             // clear
             configFile.Clear();
             // write
-            configFile.WriteLine("# SETTINGS\ndebug = " + std::to_string(config.debug) +
-                "\ndelock = " + std::to_string(config.delock) +
-                "\nold_odds = " + std::to_string(config.old_odds) +
-                "\nnotify = " + std::to_string(config.notify));
+            configFile.WriteLine("# SETTINGS\ndebug = " + boolToString(config.debug) +
+                "\ndelock = " + boolToString(config.delock) +
+                "\nold_odds = " + boolToString(config.old_odds) +
+                "\nnotify = " + locationToString(config.notify));
             configFile.Close();
             return true;
         }
 
+        static std::string getContentFromPath(std::string path) {
+            File configFile = File(path, File::READ);
+            std::string content(configFile.GetSize(), '\0');
+            configFile.Read(&content[0], content.size());
+            configFile.Close();
+            return content;
+        }
+
         // return line at index line
         // Read from an unopened path
-        static std::string readLine(std::string path, int line) {
+        static std::string readLineFromPath(std::string path, int line) {
             std::string myLine;
             File configFile = File(path, File::READ);
             std::string content(configFile.GetSize(), '\0');
@@ -76,7 +84,7 @@ namespace CTRPluginFramework {
             configFile.Close();
 
             int lineCount = 0;
-            if (countLine(path) < line)
+            if (countLineFromContent(content) < line)
             {
                 return "LINE OUT OF RANGE";
             }
@@ -95,7 +103,7 @@ namespace CTRPluginFramework {
         }
 
         // Read from an already opened File
-        static std::string readLine(File& myFile, int line) {
+        static std::string readLineFromFile(File& myFile, int line) {
             std::string myLine;
             std::string content(myFile.GetSize(), '\0');
             myFile.Read(&content[0], content.size());
@@ -119,27 +127,64 @@ namespace CTRPluginFramework {
             return myLine;
         }
 
-        // count line from path
-        // static int countLine(std::string path) {
-        //     std::string myLine;
-        //     File configFile = File(path, File::READ);
-        //     std::string content(configFile.GetSize(), '\0');
-        //     configFile.Read(&content[0], content.size());
-        //     configFile.Close();
+        static std::string readLineFromContent(std::string myContent, int line) {
+            std::string myLine;
 
-        //     int lineCount = 0;
-        //     for (size_t i = 0; i < content.size(); i++)
-        //     {
-        //         if (content[i] == '\n')
-        //         {
-        //             lineCount++;
-        //         }
-        //     }
-        //     return lineCount;
-        // }
+            int lineCount = 0;
+            // for (size_t i = 0; i < myContent.size(); i++)
+            // {
+            //     if (myContent[i] == '\n')
+            //     {
+            //         lineCount++;
+            //     }
+            //     if (lineCount == line && myContent[i] != '\n')
+            //     {
+            //         myLine = myLine + myContent[i];
+            //     }
+            //     if (lineCount < line)
+            //     {
+            //         return "LINE OUT OF RANGE";
+            //     }
+            // }
+            // return myLine;
+            if (countLineFromContent(myContent) < line)
+            {
+                return "LINE OUT OF RANGE";
+            }
+            for (size_t i = 0; i < myContent.size(); i++)
+            {
+                if (myContent[i] == '\n')
+                {
+                    lineCount++;
+                }
+                if (lineCount == line && myContent[i] != '\n')
+                {
+                    myLine = myLine + myContent[i];
+                }
+            }
+            return myLine;
+        }
+
+        // count line from path
+        static int countLineFromPath(std::string path) {
+            File configFile = File(path, File::READ);
+            std::string content(configFile.GetSize(), '\0');
+            configFile.Read(&content[0], content.size());
+            configFile.Close();
+
+            int lineCount = 0;
+            for (size_t i = 0; i < content.size(); i++)
+            {
+                if (content[i] == '\n')
+                {
+                    lineCount++;
+                }
+            }
+            return lineCount;
+        }
 
         // count line from file
-        static int countLine(File& myFile) {
+        static int countLineFromFile(File& myFile) {
             std::string content(myFile.GetSize(), '\0');
             myFile.Read(&content[0], content.size());
 
@@ -155,7 +200,7 @@ namespace CTRPluginFramework {
         }
 
         // count line from content string
-        static int countLine(std::string myContent) {
+        static int countLineFromContent(std::string myContent) {
             int lineCount = 0;
             for (size_t i = 0; i < myContent.size(); i++)
             {
@@ -172,7 +217,7 @@ namespace CTRPluginFramework {
             std::string newString;
             for (size_t i = 0; i < myString.size(); i++)
             {
-                if (myString[i] != ' ' || myString[i] != '\n')
+                if (myString[i] != ' ' && myString[i] != '\n')
                 {
                     newString = newString + myString[i];
                 }
@@ -181,88 +226,172 @@ namespace CTRPluginFramework {
         }
 
         static bool readParamBool(std::string param, std::string myContent) {
-            std::string myParam;
-            for (int i = 0; i < countLine(myContent); i++)
+            // if (param == "debug")
+            // {
+            //     return true;
+            // }
+
+            // return false;
+
+
+
+            for (int i = 0; i < countLineFromContent(myContent); i++)
             {
-                std::string myLine = readLine(myContent, i);
-                for (int j = 0; j < myLine.size(); j++)
+                std::string myParam;
+                std::string myLine = clean(readLineFromContent(myContent, i));
+                for (size_t j = 0; j < param.size(); j++)
                 {
-                    myParam = "";
-                    if (myLine[j] != param[j])
-                    {
-                        break;
-                    }
-                    if (myLine[j] == '=')
-                    {
-                        j++;
-                    }
-                    if (myParam != param && myParam.size() < param.size())
-                    {
-                        myParam += param[j];
-                    }
-                    if (j > param.size())
-                    {
-                        if (myLine[j] == std::tolower('t'))
-                        {
-                            return true;
-                        }
-                        else
-                        {
-                            return false;
-                        }
-
-                    }
-
+                    myParam += myLine[j];
                 }
+                if (myParam == param)
+                {
+                    if (myLine[param.size() + 1] == std::tolower('t'))
+                    {
+                        return true;
+                    }
+                    return false;
+                }
+
             }
             return false;
         }
 
+        // static std::string testReadParamBool(std::string param, std::string myContent) {
+        //     // if (param == "debug")
+        //     // {
+        //     //     return true;
+        //     // }
+
+        //     // return false;
+
+
+
+        //     for (int i = 0; i < countLineFromContent(myContent); i++)
+        //     {
+        //         std::string myParam;
+        //         std::string myLine = clean(readLineFromContent(myContent, i));
+        //         for (size_t j = 0; j < param.size(); j++)
+        //         {
+        //             myParam += myLine[j];
+        //         }
+
+        //         if (i == 1)
+        //         {
+        //             return myParam;
+        //         }
+
+
+        //         if (myParam == param)
+        //         {
+
+        //             if (myLine[param.size() + 1] == std::tolower('t'))
+        //             {
+        //                 // return true;
+        //             }
+        //             // return false;
+        //         }
+
+        //     }
+        //     // return true;
+        // }
+
 
         static Location readParamLocation(std::string param, std::string myContent) {
-            std::string myParam;
-            for (int i = 0; i < countLine(myContent); i++)
+            for (int i = 0; i < countLineFromContent(myContent); i++)
             {
-                std::string myLine = readLine(myContent, i);
-                for (int j = 0; j < myLine.size(); j++)
+                std::string myParam;
+                std::string myLine = clean(readLineFromContent(myContent, i));
+                for (size_t j = 0; j < param.size(); j++)
                 {
-                    myParam = "";
-                    if (myLine[j] != param[j])
+                    myParam += myLine[j];
+                }
+                if (myParam == param)
+                {
+                    if (myLine[param.size() + 1] == 't' || myLine[param.size() + 1] == 'T')
                     {
-                        break;
+                        return TOP;
                     }
-                    if (myLine[j] == '=')
+                    else if (myLine[param.size() + 1] == 'n' || myLine[param.size() + 1] == 'N')
                     {
-                        j++;
+                        return NONE;
                     }
-                    if (myParam != param && myParam.size() < param.size())
+                    else if (myLine[param.size() + 1] == 'b' || myLine[param.size() + 1] == 'B')
                     {
-                        myParam += param[j];
-                    }
-                    if (j > param.size())
-                    {
-                        if (myLine[j] == std::tolower('t'))
+                        if (myLine[param.size() + 3] == 'h' || myLine[param.size() + 3] == 'H')
                         {
-                            return TOP;
-                        }
-                        else if (myLine[j] == std::tolower('n'))
-                        {
-                            return NONE;
-                        }
-                        else if (myLine[j + 3] == std::tolower('h')) {
                             return BOTH;
                         }
                         else
                         {
                             return BOTTOM;
                         }
-
                     }
-
                 }
 
             }
             return NONE;
+        }
+
+        // static std::string testReadParamLocation(std::string param, std::string myContent) {
+        //     for (int i = 0; i < countLineFromContent(myContent); i++)
+        //     {
+        //         std::string myParam;
+        //         std::string myLine = clean(readLineFromContent(myContent, i));
+        //         for (size_t j = 0; j < param.size(); j++)
+        //         {
+        //             myParam += myLine[j];
+        //         }
+        //         if (myParam == param)
+        //         {
+        //             if (myLine[param.size() + 1] == std::tolower('t'))
+        //             {
+        //                 // return "" + myLine[param.size() + 1] + myLine[param.size() + 2] + myLine[param.size() + 3];
+        //                 return myLine;
+        //             }
+        //             else if (myLine[param.size() + 1] == std::tolower('n'))
+        //             {
+        //                 // return "" + myLine[param.size() + 1] + myLine[param.size() + 2] + myLine[param.size() + 3];
+        //                 return myLine;
+        //             }
+        //             else if (myLine[param.size() + 3] == std::tolower('h'))
+        //             {
+        //                 // return "" + myLine[param.size() + 1] + myLine[param.size() + 2] + myLine[param.size() + 3];
+        //                 return myLine;
+        //             }
+        //             else
+        //             {
+        //                 // return "" + myLine[param.size() + 1] + myLine[param.size() + 2] + myLine[param.size() + 3];
+        //                 return myLine;
+        //             }
+        //         }
+
+        //     }
+        //     return "WHAT";
+        // }
+
+        static std::string boolToString(bool myBool) {
+            if (myBool)
+            {
+                return "true";
+            }
+            return "false";
+        }
+
+        static std::string locationToString(Location myLocation) {
+            if (myLocation == TOP)
+            {
+                return "TOP";
+            }
+            else if (myLocation == BOTTOM)
+            {
+                return "BOTTOM";
+            }
+            else if (myLocation == BOTH)
+            {
+                return "BOTH";
+            }
+            return "NONE";
+            
         }
     };
 }

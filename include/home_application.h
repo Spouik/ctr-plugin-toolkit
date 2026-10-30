@@ -28,17 +28,22 @@
 #include "entity.h"
 #include "picture.h"
 #include "text_box.h"
+#include "config_file.h"
+
 
 class HomeApplication : public Application {
 public:
     HomeApplication();
     ~HomeApplication() override = default;
     void Update(Renderer& renderer) override;
+    void OnClosing(CTRPluginFramework::Config& config);
 
 private:
     void LoadTheme() const;
 
+    bool debug_ = false;
     bool delock_ = false;
+    bool old_odds_ = false;
     bool is_dark_theme_ = false;
     u16 title_color_ = 0x0000;
 
@@ -52,9 +57,17 @@ private:
     //   Picture icon_coin_;
     //   Picture icon_soul_;
 
+    Picture debug_option_;
+    Picture debug_toggle_;
+    TextBox debug_text_;
+
     Picture delock_option_;
-    Picture toggle_delock_;
+    Picture delock_toggle_;
     TextBox delock_text_;
+
+    Picture old_odds_option_;
+    Picture old_odds_toggle_;
+    TextBox old_odds_text_;
 
     Picture back_pattern_top_;
     Picture back_pattern_bottom_;

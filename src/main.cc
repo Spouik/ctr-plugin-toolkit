@@ -30,16 +30,15 @@
 
 namespace CTRPluginFramework {
 
-    
+
 
     static Config gConfig;
-
 
     bool debugOSD(const Screen& screen) {
         u32 y = 10;
         u8 readValue = 0;
         y = screen.Draw("SSM loaded", 10, y);
-        Process::Read8(0x0014F690, readValue); 
+        Process::Read8(0x0014F690, readValue);
         char buf[32];
         snprintf(buf, sizeof(buf), "Lock Address : 0x%02X", readValue);
         y = screen.Draw(buf, 10, y);
@@ -51,7 +50,7 @@ namespace CTRPluginFramework {
         {
             y = screen.Draw("LOCKED", 10, y, Color::Red);
         }
-        Process::Read8(0x00168adc, readValue); 
+        Process::Read8(0x00168adc, readValue);
         buf[32];
         snprintf(buf, sizeof(buf), "Odds Address : 0x%02X", readValue);
         y = screen.Draw(buf, 10, y);
@@ -65,9 +64,14 @@ namespace CTRPluginFramework {
         }
         std::string maChaine = "Read result = " + std::to_string(gConfig.result);
         y = screen.Draw(maChaine, 10, y);
-        y = screen.Draw(gConfig.test2, 10, y);
-        
-        
+        y = screen.Draw(std::to_string(gConfig.debug), 10, y);
+        y = screen.Draw(std::to_string(gConfig.delock), 10, y);
+        y = screen.Draw(std::to_string(gConfig.old_odds), 10, y);
+        y = screen.Draw(std::to_string(gConfig.notify), 10, y);
+
+
+
+
         return true;
     }
 
@@ -81,25 +85,47 @@ namespace CTRPluginFramework {
             configFile->Close();
         }
         ConfigFile::load(gConfig);
-        gConfig.test2 = ConfigFile::clean(ConfigFile::readLine("config.ini", 1));
+        // gConfig.test2 = ConfigFile::clean(ConfigFile::readLineFromPath("config.ini", 1));
+            // File configFile = File("config.ini", File::READ);
+            // std::string content(configFile.GetSize(), '\0');
+            // configFile.Read(&content[0], content.size());
+            // configFile.Close();
+        // gConfig.test2 = std::to_string(ConfigFile::countLineFromContent(content));
+        // gConfig.test2 = ConfigFile::testReadParamLocation("notify", content);
+        // gConfig.test2 = ConfigFile::clean(ConfigFile::readLineFromContent(content, 1));
         gConfig.delock = true;
         ConfigFile::write(gConfig, "config.ini");
-        
 
-        Process::Write8(0x0014F690, 0x09);
-        Process::Write8(0x00168adc, 0x08);
+
+        if (gConfig.delock)
+        {
+            CTRPluginFramework::Process::Write8(0x0014F690, 0x09);
+        }
+        else
+        {
+            CTRPluginFramework::Process::Write8(0x0014F690, 0x18);
+        }
+
+        if (gConfig.old_odds)
+        {
+            CTRPluginFramework::Process::Write8(0x00168adc, 0x08);
+        }
+        else
+        {
+            CTRPluginFramework::Process::Write8(0x00168adc, 0x10);
+        }
         if (gConfig.debug)
         {
             OSD::Run(debugOSD);
         }
-        
-        
+
+
         // File* monFichier = new File();
         // monFichier->Create("./monFichier");
         ApplicationManager& application_manager = ApplicationManager::GetInstance();
         HomeApplication home_application;
         application_manager.SetApplication(&home_application);
-        application_manager.Run();
+        application_manager.Run(gConfig);
         return 0;
     }
 }  // namespace CTRPluginFramework

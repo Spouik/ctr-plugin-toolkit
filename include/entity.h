@@ -24,6 +24,7 @@
 
 #ifndef CTR_PLUGIN_TOOLKIT_ENTITY_H
 #define CTR_PLUGIN_TOOLKIT_ENTITY_H
+#include "config_file.h"
 
 class Renderer;
 
@@ -31,6 +32,7 @@ class Entity {
 public:
     virtual ~Entity() = default;
 
+    virtual void OnClosing(CTRPluginFramework::Config& config) {};
     virtual void Update(Renderer& renderer) = 0;
 };
 

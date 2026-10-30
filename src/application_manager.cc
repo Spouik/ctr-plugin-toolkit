@@ -29,11 +29,12 @@
 #include <CTRPluginFramework/System/Sleep.hpp>
 #include <CTRPluginFramework/System/Time.hpp>
 
+#include "config_file.h"
 #include "renderer.h"
 
 using namespace CTRPluginFramework;
 
-void ApplicationManager::Run() const {
+void ApplicationManager::Run(Config& config) const {
     if (application_ == nullptr) return;
     Renderer& renderer = Renderer::GetInstance();
     while (true) {
@@ -48,6 +49,7 @@ void ApplicationManager::Run() const {
                 application_->Update(renderer);
                 OSD::SwapBuffers();
             }
+            application_->OnClosing(config);
             Process::Play();
         }
         Sleep(Milliseconds(kSleepTimeMs));

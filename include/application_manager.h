@@ -31,30 +31,36 @@
 
 class ApplicationManager {
 public:
-  ApplicationManager(const ApplicationManager&) = delete;
-  ApplicationManager& operator=(const ApplicationManager&) = delete;
-  ApplicationManager(ApplicationManager&&) = delete;
-  ApplicationManager& operator=(ApplicationManager&&) = delete;
+    ApplicationManager(const ApplicationManager&) = delete;
+    ApplicationManager& operator=(const ApplicationManager&) = delete;
+    ApplicationManager(ApplicationManager&&) = delete;
+    ApplicationManager& operator=(ApplicationManager&&) = delete;
 
-  static ApplicationManager& GetInstance() {
-    static ApplicationManager instance;
-    return instance;
-  }
+    static ApplicationManager& GetInstance() {
+        static ApplicationManager instance;
+        return instance;
+    }
 
-  void SetApplication(Application* application) {
-    application_ = application;
-  }
+    void SetApplication(Application* application) {
+        application_ = application;
+    }
 
-  void Run() const;
+    Application* GetApplication() {
+        return application_;
+    }
+
+    void OnClosing();
+
+    void Run(CTRPluginFramework::Config& config) const;
 
 private:
-  static constexpr CTRPluginFramework::Key kMenuToggleKey =
-      CTRPluginFramework::Select;
-  static constexpr int kSleepTimeMs = 1;
+    static constexpr CTRPluginFramework::Key kMenuToggleKey =
+        CTRPluginFramework::Select;
+    static constexpr int kSleepTimeMs = 1;
 
-  ApplicationManager() = default;
+    ApplicationManager() = default;
 
-  Application* application_ = nullptr;
+    Application* application_ = nullptr;
 };
 
 #endif // CTR_PLUGIN_TOOLKIT_APPLICATION_MANAGER_H
